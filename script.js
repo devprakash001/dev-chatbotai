@@ -15,7 +15,9 @@ const createChatLi = (message, className) => {
   // Create a chat <li> element with passed message and className
   const chatLi = document.createElement("li");
   chatLi.classList.add("chat", `${className}`);
-  let chatContent = className === "outgoing" ? `<p></p>` : `<span class="material-symbols-outlined">smart_toy</span><p></p>`;
+  let chatContent = className === "outgoing" 
+    ? `<p></p>` 
+    : `<span class="material-symbols-outlined">smart_toy</span><p></p>`;
   chatLi.innerHTML = chatContent;
   chatLi.querySelector("p").textContent = message;
   return chatLi; // return chat <li> element
@@ -36,7 +38,7 @@ const generateResponse = async (chatElement) => {
     }),
   }
 
-  // Send POST request to API, get response and set the reponse as paragraph text
+  // Send POST request to API, get response and set the response as paragraph text
   try {
     const response = await fetch(API_URL, requestOptions);
     const data = await response.json();
@@ -65,13 +67,22 @@ const handleChat = () => {
   chatbox.appendChild(createChatLi(userMessage, "outgoing"));
   chatbox.scrollTo(0, chatbox.scrollHeight);
 
-  setTimeout(() => {
-    // Display "Thinking..." message while waiting for the response
-    const incomingChatLi = createChatLi("Thinking...", "incoming");
+  // Check if the user is asking for the date or time
+  if (userMessage.toLowerCase().includes("date") || userMessage.toLowerCase().includes("time")) {
+    const currentDate = new Date();
+    const dateTimeString = currentDate.toLocaleString(); // Get current date and time as a string
+    const incomingChatLi = createChatLi(`Current date and time: ${dateTimeString}`, "incoming");
     chatbox.appendChild(incomingChatLi);
     chatbox.scrollTo(0, chatbox.scrollHeight);
-    generateResponse(incomingChatLi);
-  }, 600);
+  } else {
+    setTimeout(() => {
+      // Display "Thinking..." message while waiting for the response
+      const incomingChatLi = createChatLi("Thinking...", "incoming");
+      chatbox.appendChild(incomingChatLi);
+      chatbox.scrollTo(0, chatbox.scrollHeight);
+      generateResponse(incomingChatLi);
+    }, 600);
+  }
 }
 
 chatInput.addEventListener("input", () => {
